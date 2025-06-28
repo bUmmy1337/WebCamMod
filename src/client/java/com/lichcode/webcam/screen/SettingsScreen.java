@@ -3,6 +3,7 @@ package com.lichcode.webcam.screen;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamException;
 import com.lichcode.webcam.WebcamMod;
+import com.lichcode.webcam.config.WebcamConfig;
 import com.lichcode.webcam.video.VideoCamara;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,6 +13,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.entity.LivingEntity;
@@ -40,12 +42,17 @@ public class SettingsScreen extends Screen {
         if (!this.webcamEntryList.canSwitch) {
             context.drawTooltip(this.textRenderer, Text.of("Opening webcam..."), this.width/4*2, 50);
         }
+        
+        // Draw configuration section title
+        int rightPanelX = this.width / 4 * 3 + 10;
+        context.drawTextWithShadow(this.textRenderer, Text.of("Webcam Configuration"), rightPanelX, 10, 0xFFFFFF);
     }
 
     @Override
     public void init() {
         initCloseButton();
         initWebcamList();
+        initConfigurationControls();
     }
 
     private void initCloseButton() {
@@ -86,6 +93,139 @@ public class SettingsScreen extends Screen {
 
         this.webcamEntryList = listWidget;
         addDrawableChild(listWidget);
+    }
+
+    private void initConfigurationControls() {
+        WebcamConfig config = WebcamConfig.getInstance();
+        int rightPanelX = this.width / 4 * 3 + 10;
+        int controlWidth = 150;
+        int y = 30;
+        int spacing = 25;
+
+        // Position controls
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("X Offset: " + String.format("%.2f", config.getOffsetX())), 
+            (config.getOffsetX() + 2.0f) / 4.0f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) this.value * 4.0f - 2.0f;
+                this.setMessage(Text.of("X Offset: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) this.value * 4.0f - 2.0f;
+                config.setOffsetX(value);
+            }
+        });
+        y += spacing;
+
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Y Offset: " + String.format("%.2f", config.getOffsetY())), 
+            (config.getOffsetY() + 1.0f) / 4.0f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) this.value * 4.0f - 1.0f;
+                this.setMessage(Text.of("Y Offset: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) this.value * 4.0f - 1.0f;
+                config.setOffsetY(value);
+            }
+        });
+        y += spacing;
+
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Z Offset: " + String.format("%.2f", config.getOffsetZ())), 
+            (config.getOffsetZ() + 2.0f) / 4.0f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) this.value * 4.0f - 2.0f;
+                this.setMessage(Text.of("Z Offset: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) this.value * 4.0f - 2.0f;
+                config.setOffsetZ(value);
+            }
+        });
+        y += spacing;
+
+        // Scale control
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Scale: " + String.format("%.2f", config.getScale())), 
+            config.getScale() / 2.0f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) this.value * 2.0f;
+                this.setMessage(Text.of("Scale: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) this.value * 2.0f;
+                config.setScale(value);
+            }
+        });
+        y += spacing;
+
+        // Opacity control
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Opacity: " + String.format("%.2f", config.getOpacity())), 
+            config.getOpacity()) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) this.value;
+                this.setMessage(Text.of("Opacity: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) this.value;
+                config.setOpacity(value);
+            }
+        });
+        y += spacing;
+
+        // Shape toggle button
+        String shapeText = config.isCircular() ? "Shape: Circle" : "Shape: Rectangle";
+        addDrawableChild(ButtonWidget.builder(Text.of(shapeText), button -> {
+            config.setCircular(!config.isCircular());
+            String newText = config.isCircular() ? "Shape: Circle" : "Shape: Rectangle";
+            button.setMessage(Text.of(newText));
+        }).dimensions(rightPanelX, y, controlWidth, 20).build());
+        y += spacing;
+
+        // Circle segments control (only visible when circular)
+        if (config.isCircular()) {
+            addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+                Text.of("Circle Quality: " + config.getCircleSegments()), 
+                (config.getCircleSegments() - 8) / 56.0f) {
+                @Override
+                protected void updateMessage() {
+                    int value = (int) (this.value * 56) + 8;
+                    this.setMessage(Text.of("Circle Quality: " + value));
+                }
+                @Override
+                protected void applyValue() {
+                    int value = (int) (this.value * 56) + 8;
+                    config.setCircleSegments(value);
+                }
+            });
+            y += spacing;
+        }
+
+        // Reset button
+        addDrawableChild(ButtonWidget.builder(Text.of("Reset to Defaults"), button -> {
+            config.offsetX = 0.0f;
+            config.offsetY = 1.5f;
+            config.offsetZ = 0.0f;
+            config.scale = 0.8f;
+            config.circular = true;
+            config.circleSegments = 32;
+            config.opacity = 1.0f;
+            config.save();
+            // Reinitialize the screen to update all controls
+            this.init();
+        }).dimensions(rightPanelX, y, controlWidth, 20).build());
     }
 
     public static void drawEntity(DrawContext context, int x1, int y1, int x2, int y2, float size, float f, float mouseX, float mouseY, LivingEntity entity) {

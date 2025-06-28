@@ -41,6 +41,10 @@ dependencies {
 	implementation "com.github.sarxos:webcam-capture:0.3.12"
 	include "com.github.sarxos:webcam-capture:0.3.12"
 	include "com.nativelibs4java:bridj:0.7.0"
+	
+	// Gson for configuration
+	implementation "com.google.code.gson:gson:2.10.1"
+	include "com.google.code.gson:gson:2.10.1"
 }
 
 processResources {
