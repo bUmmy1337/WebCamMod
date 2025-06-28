@@ -32,7 +32,7 @@ public class SettingsScreen extends Screen {
     private WebcamEntryList webcamEntryList;
 
     public SettingsScreen() {
-        super(Text.of(WebcamMod.MOD_ID + " Settings"));
+        super(Text.translatable("gui.webcam.settings.title"));
     }
 
     @Override
@@ -40,12 +40,12 @@ public class SettingsScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         drawEntity(context, this.width/4, 0, this.width/4*3, this.height, 100 * zoom, 0.0625F, mouseX, mouseY, this.client.player);
         if (!this.webcamEntryList.canSwitch) {
-            context.drawTooltip(this.textRenderer, Text.of("Opening webcam..."), this.width/4*2, 50);
+            context.drawTooltip(this.textRenderer, Text.translatable("gui.webcam.settings.opening_webcam"), this.width/4*2, 50);
         }
         
         // Draw configuration section title
         int rightPanelX = this.width / 4 * 3 + 10;
-        context.drawTextWithShadow(this.textRenderer, Text.of("Webcam Configuration"), rightPanelX, 10, 0xFFFFFF);
+        context.drawTextWithShadow(this.textRenderer, Text.translatable("gui.webcam.settings.webcam_configuration"), rightPanelX, 10, 0xFFFFFF);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SettingsScreen extends Screen {
     }
 
     private void initCloseButton() {
-        Text closeButtonTitle = Text.of("Close");
+        Text closeButtonTitle = Text.translatable("gui.webcam.settings.close");
         int closeButtonWidth = 100;
         int closeButtonX = width - closeButtonWidth - ELEMENT_SPACING;
         int closeButtonY = height - ELEMENT_HEIGHT - ELEMENT_SPACING;
@@ -104,12 +104,12 @@ public class SettingsScreen extends Screen {
 
         // Position controls
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("X Offset: " + String.format("%.2f", config.getOffsetX())), 
+            Text.translatable("gui.webcam.settings.x_offset", String.format("%.2f", config.getOffsetX())),
             (config.getOffsetX() + 2.0f) / 4.0f) {
             @Override
             protected void updateMessage() {
                 float value = (float) this.value * 4.0f - 2.0f;
-                this.setMessage(Text.of("X Offset: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.x_offset", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -120,12 +120,12 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Y Offset: " + String.format("%.2f", config.getOffsetY())), 
+            Text.translatable("gui.webcam.settings.y_offset", String.format("%.2f", config.getOffsetY())),
             (config.getOffsetY() + 1.0f) / 4.0f) {
             @Override
             protected void updateMessage() {
                 float value = (float) this.value * 4.0f - 1.0f;
-                this.setMessage(Text.of("Y Offset: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.y_offset", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -136,12 +136,12 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Z Offset: " + String.format("%.2f", config.getOffsetZ())), 
+            Text.translatable("gui.webcam.settings.z_offset", String.format("%.2f", config.getOffsetZ())),
             (config.getOffsetZ() + 2.0f) / 4.0f) {
             @Override
             protected void updateMessage() {
                 float value = (float) this.value * 4.0f - 2.0f;
-                this.setMessage(Text.of("Z Offset: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.z_offset", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -153,12 +153,12 @@ public class SettingsScreen extends Screen {
 
         // Scale control
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Scale: " + String.format("%.2f", config.getScale())), 
+            Text.translatable("gui.webcam.settings.scale", String.format("%.2f", config.getScale())),
             config.getScale() / 2.0f) {
             @Override
             protected void updateMessage() {
                 float value = (float) this.value * 2.0f;
-                this.setMessage(Text.of("Scale: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.scale", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -170,12 +170,12 @@ public class SettingsScreen extends Screen {
 
         // Opacity control
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Opacity: " + String.format("%.2f", config.getOpacity())), 
+            Text.translatable("gui.webcam.settings.opacity", String.format("%.2f", config.getOpacity())),
             config.getOpacity()) {
             @Override
             protected void updateMessage() {
                 float value = (float) this.value;
-                this.setMessage(Text.of("Opacity: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.opacity", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -186,23 +186,23 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         // Shape toggle button
-        String shapeText = config.isCircular() ? "Shape: Circle" : "Shape: Rectangle";
-        addDrawableChild(ButtonWidget.builder(Text.of(shapeText), button -> {
+        Text shapeText = config.isCircular() ? Text.translatable("gui.webcam.settings.shape_circle") : Text.translatable("gui.webcam.settings.shape_rectangle");
+        addDrawableChild(ButtonWidget.builder(shapeText, button -> {
             config.setCircular(!config.isCircular());
-            String newText = config.isCircular() ? "Shape: Circle" : "Shape: Rectangle";
-            button.setMessage(Text.of(newText));
+            Text newText = config.isCircular() ? Text.translatable("gui.webcam.settings.shape_circle") : Text.translatable("gui.webcam.settings.shape_rectangle");
+            button.setMessage(newText);
         }).dimensions(rightPanelX, y, controlWidth, 20).build());
         y += spacing;
 
         // Circle segments control (only visible when circular)
         if (config.isCircular()) {
             addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-                Text.of("Circle Quality: " + config.getCircleSegments()), 
+                Text.translatable("gui.webcam.settings.circle_quality", config.getCircleSegments()),
                 (config.getCircleSegments() - 8) / 56.0f) {
                 @Override
                 protected void updateMessage() {
                     int value = (int) (this.value * 56) + 8;
-                    this.setMessage(Text.of("Circle Quality: " + value));
+                    this.setMessage(Text.translatable("gui.webcam.settings.circle_quality", value));
                 }
                 @Override
                 protected void applyValue() {
@@ -215,12 +215,12 @@ public class SettingsScreen extends Screen {
 
         // Zoom and Stretch controls
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Zoom: " + String.format("%.2f", config.getZoom())), 
+            Text.translatable("gui.webcam.settings.zoom", String.format("%.2f", config.getZoom())),
             (config.getZoom() - 0.1f) / 4.9f) {
             @Override
             protected void updateMessage() {
                 float value = (float) (this.value * 4.9f + 0.1f);
-                this.setMessage(Text.of("Zoom: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.zoom", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -231,12 +231,12 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Stretch: " + String.format("%.2f", config.getStretch())), 
+            Text.translatable("gui.webcam.settings.stretch", String.format("%.2f", config.getStretch())),
             (config.getStretch() - 0.1f) / 4.9f) {
             @Override
             protected void updateMessage() {
                 float value = (float) (this.value * 4.9f + 0.1f);
-                this.setMessage(Text.of("Stretch: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.stretch", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -247,12 +247,12 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Pan X: " + String.format("%.2f", config.getPanX())), 
+            Text.translatable("gui.webcam.settings.pan_x", String.format("%.2f", config.getPanX())),
             (config.getPanX() + 0.5f)) {
             @Override
             protected void updateMessage() {
                 float value = (float) (this.value - 0.5f);
-                this.setMessage(Text.of("Pan X: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.pan_x", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -263,12 +263,12 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.of("Pan Y: " + String.format("%.2f", config.getPanY())), 
+            Text.translatable("gui.webcam.settings.pan_y", String.format("%.2f", config.getPanY())),
             (config.getPanY() + 0.5f)) {
             @Override
             protected void updateMessage() {
                 float value = (float) (this.value - 0.5f);
-                this.setMessage(Text.of("Pan Y: " + String.format("%.2f", value)));
+                this.setMessage(Text.translatable("gui.webcam.settings.pan_y", String.format("%.2f", value)));
             }
             @Override
             protected void applyValue() {
@@ -279,7 +279,7 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         // Reset button
-        addDrawableChild(ButtonWidget.builder(Text.of("Reset to Defaults"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.settings.reset_to_defaults"), button -> {
             config.offsetX = 0.0f;
             config.offsetY = 1.5f;
             config.offsetZ = 0.0f;
@@ -298,7 +298,7 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         // Preview settings button
-        addDrawableChild(ButtonWidget.builder(Text.of("Preview Settings"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.settings.preview_settings"), button -> {
             client.setScreen(new PreviewSettingsScreen(this));
         }).dimensions(rightPanelX, y, controlWidth, 20).build());
     }
@@ -383,7 +383,7 @@ public class SettingsScreen extends Screen {
 
         @Override
         protected void renderHeader(DrawContext context, int x, int y) {
-            context.drawCenteredTextWithShadow(SettingsScreen.this.textRenderer, Text.of("Select Webcam"), this.width/2, y, 0xFFFF00);
+            context.drawCenteredTextWithShadow(SettingsScreen.this.textRenderer, Text.translatable("gui.webcam.settings.select_webcam"), this.width/2, y, 0xFFFF00);
             context.draw();
         }
 

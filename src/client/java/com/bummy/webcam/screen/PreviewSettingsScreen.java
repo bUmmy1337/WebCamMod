@@ -10,7 +10,7 @@ public class PreviewSettingsScreen extends Screen {
     private final Screen parent;
 
     public PreviewSettingsScreen(Screen parent) {
-        super(Text.of("Preview Settings"));
+        super(Text.translatable("gui.webcam.preview_settings.title"));
         this.parent = parent;
     }
 
@@ -24,11 +24,11 @@ public class PreviewSettingsScreen extends Screen {
         int spacing = 25;
 
         addDrawableChild(new SliderWidget(width / 2 - controlWidth / 2, y, controlWidth, 20,
-                Text.of("X Position: " + String.format("%.2f", config.getX())),
+                Text.translatable("gui.webcam.preview_settings.x_position", String.format("%.2f", config.getX())),
                 config.getX()) {
             @Override
             protected void updateMessage() {
-                setMessage(Text.of("X Position: " + String.format("%.2f", this.value)));
+                setMessage(Text.translatable("gui.webcam.preview_settings.x_position", String.format("%.2f", this.value)));
             }
 
             @Override
@@ -39,11 +39,11 @@ public class PreviewSettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(width / 2 - controlWidth / 2, y, controlWidth, 20,
-                Text.of("Y Position: " + String.format("%.2f", config.getY())),
+                Text.translatable("gui.webcam.preview_settings.y_position", String.format("%.2f", config.getY())),
                 config.getY()) {
             @Override
             protected void updateMessage() {
-                setMessage(Text.of("Y Position: " + String.format("%.2f", this.value)));
+                setMessage(Text.translatable("gui.webcam.preview_settings.y_position", String.format("%.2f", this.value)));
             }
 
             @Override
@@ -54,11 +54,11 @@ public class PreviewSettingsScreen extends Screen {
         y += spacing;
 
         addDrawableChild(new SliderWidget(width / 2 - controlWidth / 2, y, controlWidth, 20,
-                Text.of("Size: " + String.format("%.2f", config.getSize())),
+                Text.translatable("gui.webcam.preview_settings.size", String.format("%.2f", config.getSize())),
                 config.getSize()) {
             @Override
             protected void updateMessage() {
-                setMessage(Text.of("Size: " + String.format("%.2f", this.value)));
+                setMessage(Text.translatable("gui.webcam.preview_settings.size", String.format("%.2f", this.value)));
             }
 
             @Override
@@ -68,12 +68,12 @@ public class PreviewSettingsScreen extends Screen {
         });
         y += spacing;
 
-        addDrawableChild(ButtonWidget.builder(Text.of("Enabled: " + config.isEnabled()), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.preview_settings.enabled", config.isEnabled()), button -> {
             config.setEnabled(!config.isEnabled());
-            button.setMessage(Text.of("Enabled: " + config.isEnabled()));
+            button.setMessage(Text.translatable("gui.webcam.preview_settings.enabled", config.isEnabled()));
         }).dimensions(width / 2 - controlWidth / 2, y, controlWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.of("Back"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.preview_settings.back"), button -> {
             client.setScreen(parent);
         }).dimensions(width / 2 - controlWidth / 2, height - 30, controlWidth, 20).build());
     }
