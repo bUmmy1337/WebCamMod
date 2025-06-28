@@ -1,4 +1,4 @@
-package com.lichcode.webcam.render.buffer;
+package com.bummy.webcam.render.buffer;
 
 import java.nio.ByteBuffer;
 

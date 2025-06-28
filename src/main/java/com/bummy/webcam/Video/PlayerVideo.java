@@ -1,4 +1,4 @@
-package com.lichcode.webcam.Video;
+package com.bummy.webcam.Video;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

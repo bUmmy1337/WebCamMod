@@ -1,8 +1,8 @@
-package com.lichcode.webcam.render;
+package com.bummy.webcam.render;
 
-import com.lichcode.webcam.PlayerFeeds;
-import com.lichcode.webcam.config.WebcamConfig;
-import com.lichcode.webcam.render.image.RenderableImage;
+import com.bummy.webcam.PlayerFeeds;
+import com.bummy.webcam.config.WebcamConfig;
+import com.bummy.webcam.render.image.RenderableImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.*;
@@ -99,39 +99,53 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
     }
 
     private void renderCircularWebcam(BufferBuilder buffer, Matrix4f position, int segments) {
+        WebcamConfig config = WebcamConfig.getInstance();
         float radius = 1.0f;
-        
-        // Create a circle using triangular segments
+        float zoom = config.getZoom();
+        float stretch = config.getStretch();
+        float panX = config.getPanX();
+        float panY = config.getPanY();
+
         for (int i = 0; i < segments; i++) {
             float angle1 = (float) (2 * Math.PI * i / segments);
             float angle2 = (float) (2 * Math.PI * (i + 1) / segments);
-            
+
             float x1 = (float) Math.cos(angle1) * radius;
             float y1 = (float) Math.sin(angle1) * radius;
             float x2 = (float) Math.cos(angle2) * radius;
             float y2 = (float) Math.sin(angle2) * radius;
-            
-            // Calculate texture coordinates (map circle to square texture)
-            float u1 = (x1 + 1) * 0.5f;
-            float v1 = (y1 + 1) * 0.5f;
-            float u2 = (x2 + 1) * 0.5f;
-            float v2 = (y2 + 1) * 0.5f;
-            
-            // Triangle from center to edge
-            buffer.vertex(position, 0, 0, 0).texture(0.5f, 0.5f); // Center
-            buffer.vertex(position, x1, y1, 0).texture(u1, v1);   // First edge point
-            buffer.vertex(position, x2, y2, 0).texture(u2, v2);   // Second edge point
+
+            float u1 = (x1 * stretch / zoom + 1) / 2 + panX;
+            float v1 = (y1 / zoom + 1) / 2 + panY;
+            float u2 = (x2 * stretch / zoom + 1) / 2 + panX;
+            float v2 = (y2 / zoom + 1) / 2 + panY;
+            float uc = 0.5f + panX;
+            float vc = 0.5f + panY;
+
+            buffer.vertex(position, 0, 0, 0).texture(uc, vc);
+            buffer.vertex(position, x1, y1, 0).texture(u1, v1);
+            buffer.vertex(position, x2, y2, 0).texture(u2, v2);
         }
     }
 
     private void renderRectangularWebcam(BufferBuilder buffer, Matrix4f position) {
-        // Original rectangular rendering
-        buffer.vertex(position, 1, -1, 0).texture(0, 0);
-        buffer.vertex(position, 1, 1, 0).texture(0, 1);
-        buffer.vertex(position, -1, 1, 0).texture(1, 1);
+        WebcamConfig config = WebcamConfig.getInstance();
+        float zoom = config.getZoom();
+        float stretch = config.getStretch();
+        float panX = config.getPanX();
+        float panY = config.getPanY();
 
-        buffer.vertex(position, -1, 1, 0).texture(1, 1);
-        buffer.vertex(position, 1, -1, 0).texture(0, 0);
-        buffer.vertex(position, -1, -1, 0).texture(1, 0);
+        float u1 = (0.5f - 0.5f / zoom) * stretch + panX;
+        float v1 = (0.5f - 0.5f / zoom) + panY;
+        float u2 = (0.5f + 0.5f / zoom) * stretch + panX;
+        float v2 = (0.5f + 0.5f / zoom) + panY;
+
+        buffer.vertex(position, 1, -1, 0).texture(u1, v1);
+        buffer.vertex(position, 1, 1, 0).texture(u1, v2);
+        buffer.vertex(position, -1, 1, 0).texture(u2, v2);
+
+        buffer.vertex(position, -1, 1, 0).texture(u2, v2);
+        buffer.vertex(position, 1, -1, 0).texture(u1, v1);
+        buffer.vertex(position, -1, -1, 0).texture(u2, v1);
     }
 }

@@ -1,7 +1,7 @@
-package com.lichcode.webcam.render.image;
+package com.bummy.webcam.render.image;
 
-import com.lichcode.webcam.Video.PlayerVideo;
-import com.lichcode.webcam.render.buffer.DoublePBO;
+import com.bummy.webcam.Video.PlayerVideo;
+import com.bummy.webcam.render.buffer.DoublePBO;
 
 import java.nio.ByteBuffer;
 

@@ -1,10 +1,10 @@
-package com.lichcode.webcam.screen;
+package com.bummy.webcam.screen;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamException;
-import com.lichcode.webcam.WebcamMod;
-import com.lichcode.webcam.config.WebcamConfig;
-import com.lichcode.webcam.video.VideoCamara;
+import com.bummy.webcam.WebcamMod;
+import com.bummy.webcam.config.WebcamConfig;
+import com.bummy.webcam.video.VideoCamara;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -213,6 +213,71 @@ public class SettingsScreen extends Screen {
             y += spacing;
         }
 
+        // Zoom and Stretch controls
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Zoom: " + String.format("%.2f", config.getZoom())), 
+            (config.getZoom() - 0.1f) / 4.9f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) (this.value * 4.9f + 0.1f);
+                this.setMessage(Text.of("Zoom: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) (this.value * 4.9f + 0.1f);
+                config.setZoom(value);
+            }
+        });
+        y += spacing;
+
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Stretch: " + String.format("%.2f", config.getStretch())), 
+            (config.getStretch() - 0.1f) / 4.9f) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) (this.value * 4.9f + 0.1f);
+                this.setMessage(Text.of("Stretch: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) (this.value * 4.9f + 0.1f);
+                config.setStretch(value);
+            }
+        });
+        y += spacing;
+
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Pan X: " + String.format("%.2f", config.getPanX())), 
+            (config.getPanX() + 0.5f)) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) (this.value - 0.5f);
+                this.setMessage(Text.of("Pan X: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) (this.value - 0.5f);
+                config.setPanX(value);
+            }
+        });
+        y += spacing;
+
+        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
+            Text.of("Pan Y: " + String.format("%.2f", config.getPanY())), 
+            (config.getPanY() + 0.5f)) {
+            @Override
+            protected void updateMessage() {
+                float value = (float) (this.value - 0.5f);
+                this.setMessage(Text.of("Pan Y: " + String.format("%.2f", value)));
+            }
+            @Override
+            protected void applyValue() {
+                float value = (float) (this.value - 0.5f);
+                config.setPanY(value);
+            }
+        });
+        y += spacing;
+
         // Reset button
         addDrawableChild(ButtonWidget.builder(Text.of("Reset to Defaults"), button -> {
             config.offsetX = 0.0f;
@@ -222,9 +287,19 @@ public class SettingsScreen extends Screen {
             config.circular = true;
             config.circleSegments = 32;
             config.opacity = 1.0f;
+            config.zoom = 1.0f;
+            config.stretch = 1.0f;
+            config.panX = 0.0f;
+            config.panY = 0.0f;
             config.save();
             // Reinitialize the screen to update all controls
             this.init();
+        }).dimensions(rightPanelX, y, controlWidth, 20).build());
+        y += spacing;
+
+        // Preview settings button
+        addDrawableChild(ButtonWidget.builder(Text.of("Preview Settings"), button -> {
+            client.setScreen(new PreviewSettingsScreen(this));
         }).dimensions(rightPanelX, y, controlWidth, 20).build());
     }
 

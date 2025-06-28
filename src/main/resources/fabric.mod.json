@@ -2,23 +2,23 @@
 	"schemaVersion": 1,
 	"id": "webcam",
 	"version": "${version}",
-	"name": "Webcam",
-	"description": "Adds webcams to minecraft",
+	"name": "WebCam Bubbles",
+	"description": "Adds webcam bubbles to minecraft",
 	"authors": [
-		"Me!"
+		"bUmmy1337"
 	],
 	"contact": {
-		"homepage": "https://www.youtube.com/@lichcodes"
+		"homepage": "https://modrinth.com/project/webcam"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/webcam/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.lichcode.webcam.WebcamMod"
+			"com.bummy.webcam.WebcamMod"
 		],
 		"client": [
-			"com.lichcode.webcam.WebcamModClient"
+			"com.bummy.webcam.WebcamModClient"
 		]
 	},
 	"mixins": [

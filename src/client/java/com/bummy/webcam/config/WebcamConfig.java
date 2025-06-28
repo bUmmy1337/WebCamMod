@@ -1,4 +1,4 @@
-package com.lichcode.webcam.config;
+package com.bummy.webcam.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,7 +28,13 @@ public class WebcamConfig {
     
     // Visibility settings
     public float opacity = 1.0f;
-    
+
+    // Zoom and Stretch settings
+    public float zoom = 1.0f;
+    public float stretch = 1.0f;
+    public float panX = 0.0f;
+    public float panY = 0.0f;
+
     public static WebcamConfig getInstance() {
         if (instance == null) {
             instance = load();
@@ -83,4 +89,17 @@ public class WebcamConfig {
     
     public float getOpacity() { return opacity; }
     public void setOpacity(float opacity) { this.opacity = opacity; save(); }
+
+    // Getters and setters for zoom and stretch
+    public float getZoom() { return zoom; }
+    public void setZoom(float zoom) { this.zoom = zoom; save(); }
+
+    public float getStretch() { return stretch; }
+    public void setStretch(float stretch) { this.stretch = stretch; save(); }
+
+    public float getPanX() { return panX; }
+    public void setPanX(float panX) { this.panX = panX; save(); }
+
+    public float getPanY() { return panY; }
+    public void setPanY(float panY) { this.panY = panY; save(); }
 }

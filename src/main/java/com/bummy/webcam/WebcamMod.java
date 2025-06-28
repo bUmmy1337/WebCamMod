@@ -1,4 +1,4 @@
-package com.lichcode.webcam;
+package com.bummy.webcam;
 
 import net.fabricmc.api.ModInitializer;
 

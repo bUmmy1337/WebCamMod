@@ -1,6 +1,6 @@
-package com.lichcode.webcam.Video;
+package com.bummy.webcam.Video;
 
-import com.lichcode.webcam.WebcamMod;
+import com.bummy.webcam.WebcamMod;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 

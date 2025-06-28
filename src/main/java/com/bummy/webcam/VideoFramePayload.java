@@ -1,13 +1,13 @@
-package com.lichcode.webcam;
+package com.bummy.webcam;
 
-import com.lichcode.webcam.Video.PlayerVideo;
-import com.lichcode.webcam.Video.PlayerVideoPacketCodec;
+import com.bummy.webcam.Video.PlayerVideo;
+import com.bummy.webcam.Video.PlayerVideoPacketCodec;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
-import static com.lichcode.webcam.WebcamMod.MOD_ID;
+import static com.bummy.webcam.WebcamMod.MOD_ID;
 
 public record VideoFramePayload(PlayerVideo video) implements CustomPayload {
     public static final Identifier VIDEO_FRAME_PAYLOAD_ID = Identifier.of(MOD_ID, "video_frame");

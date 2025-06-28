@@ -1,14 +1,17 @@
-package com.lichcode.webcam;
+package com.bummy.webcam;
 
-import com.lichcode.webcam.render.PlayerFaceRenderer;
+import com.bummy.webcam.render.PlayerFaceRenderer;
 
-import com.lichcode.webcam.screen.SettingsScreen;
-import com.lichcode.webcam.video.VideoManager;
+import com.bummy.webcam.screen.SettingsScreen;
+import com.bummy.webcam.video.VideoManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import com.bummy.webcam.screen.PreviewOverlay;
+import com.bummy.webcam.config.KeyBindings;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 
 import net.minecraft.client.MinecraftClient;
@@ -16,9 +19,22 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 
 
 public class WebcamModClient implements ClientModInitializer {
+	private final PreviewOverlay previewOverlay = new PreviewOverlay();
+
 	@Override
 	public void onInitializeClient() {
+		KeyBindings.register();
 		registerSettingsCommand();
+
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			while (KeyBindings.getSettingsKeyBinding().wasPressed()) {
+				client.setScreen(new SettingsScreen());
+			}
+		});
+
+		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+			previewOverlay.render(drawContext);
+		});
 
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
 			if (entityRenderer instanceof PlayerEntityRenderer) {

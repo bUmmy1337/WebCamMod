@@ -1,7 +1,7 @@
-package com.lichcode.webcam.video;
+package com.bummy.webcam.video;
 
-import com.lichcode.webcam.WebcamMod;
-import com.lichcode.webcam.Video.PlayerVideo;
+import com.bummy.webcam.WebcamMod;
+import com.bummy.webcam.Video.PlayerVideo;
 import com.github.sarxos.webcam.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,9 +69,9 @@ public class VideoCamara {
 
     public static void get(PlayerVideo playerVideo) throws IOException {
         BufferedImage image = webcam.getImage();
-        // Resize image to defined size
-        // TODO: maybe add x/y offset so user can define size
-        image = resize(image, playerVideo.width, playerVideo.height);
+        // Update the player video with the native resolution
+        playerVideo.width = image.getWidth();
+        playerVideo.height = image.getHeight();
 
         // Compress image using JPEG
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

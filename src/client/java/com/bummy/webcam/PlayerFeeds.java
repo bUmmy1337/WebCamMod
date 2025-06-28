@@ -1,7 +1,7 @@
-package com.lichcode.webcam;
+package com.bummy.webcam;
 
-import com.lichcode.webcam.Video.PlayerVideo;
-import com.lichcode.webcam.render.image.RenderableImage;
+import com.bummy.webcam.Video.PlayerVideo;
+import com.bummy.webcam.render.image.RenderableImage;
 
 import java.util.HashMap;
 

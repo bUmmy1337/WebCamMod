@@ -1,9 +1,10 @@
-package com.lichcode.webcam.video;
+package com.bummy.webcam.video;
 
-import com.lichcode.webcam.WebcamMod;
-import com.lichcode.webcam.PlayerFeeds;
-import com.lichcode.webcam.Video.PlayerVideo;
-import com.lichcode.webcam.VideoFramePayload;
+import com.bummy.webcam.WebcamMod;
+import com.bummy.webcam.PlayerFeeds;
+import com.bummy.webcam.Video.PlayerVideo;
+import com.bummy.webcam.VideoFramePayload;
+import com.bummy.webcam.config.WebcamConfig;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 
@@ -16,7 +17,8 @@ public class VideoManager  {
 
     public static void startCameraLoop() {
         running = true;
-        videoFeed = new PlayerVideo(200, 200, MinecraftClient.getInstance().player.getUuidAsString());
+        // The video resolution will be determined by the webcam, so we pass 0,0 here
+        videoFeed = new PlayerVideo(0, 0, MinecraftClient.getInstance().player.getUuidAsString());
         new Thread(() -> {
             VideoCamara.init();
             WebcamMod.LOGGER.info("Camera loop started");
@@ -24,10 +26,10 @@ public class VideoManager  {
             // Start behind to run first loop
             Date nextUpdate = new Date();
             while(running) {
-                // Target 30fps sent to the server, I don't know if this actually helps
+                // Target 10fps sent to the server
                 Date now = new Date();
                 if (now.toInstant().isAfter(nextUpdate.toInstant())) {
-                    // 50 millis into the future
+                    // 100 millis into the future
                     nextUpdate.setTime(now.getTime() + 100);
                     loop();
                 }
