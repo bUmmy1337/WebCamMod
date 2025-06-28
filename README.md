@@ -1,23 +1,20 @@
-# Webcam Mod 
+# WebCam Bubbles Mod 
 
 Works for Minecraft version 1.21.4
 
-## Disclamer
-
-It shouldn't be used on public servers, only with people you trust. I think it's pretty easy to send a malicious payload and crash your game (or worse!). Use at your own risk.
-
-Also, this isn't production-ready. I made it for a YouTube video: https://youtu.be/pRvUX16k6yw
 
 ## Features
 
-Adds your webcam's feed to your player and displays it in real time. It works great on LAN, and I tested it on an online server with two players (I don't know if more players are too much load for the server).
+Adds a customizable pop-up (aka bubble) that displays a live image from your webcam!
+Works on LAN and servers
 
 This is a server/client mod, so it needs to be installed on both.
 
-![Screenshot of webcam](https://github.com/user-attachments/assets/9cc82fe8-2d60-43c0-ab34-18856c2a1e51)
+![Screenshot of webcam](https://github.com/bUmmy1337/WebCamMod/blob/master/screenshots/photo_2025-06-28_19-08-51.jpg)
 
 
-### 1.0.2 (download [here](https://github.com/Lichcodes/WebcamMod/releases/tag/1.0.2))
+### Download [here](https://modrinth.com/project/webcam)
 
-You can use the command `/webcam-settings` to open a menu where you can choose the device you want to use: 
-![Screenshot of menu](https://github.com/user-attachments/assets/4084a2b9-6ddc-4538-a8c1-4ac9c2035172)
+You can use the command `/webcam-settings` or press `(default) K` to open a menu where you can choose the device you want to use and customize bubbles:
+
+![Screenshot of menu](https://github.com/bUmmy1337/WebCamMod/blob/master/screenshots/photo_2025-06-28_19-08-57.jpg)
