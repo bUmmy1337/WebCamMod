@@ -10,7 +10,7 @@
 	"contact": {
 		"homepage": "https://modrinth.com/project/webcam"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/webcam/icon.png",
 	"environment": "*",
 	"entrypoints": {
