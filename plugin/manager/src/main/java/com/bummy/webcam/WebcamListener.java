@@ -5,131 +5,153 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.*;
-import java.util.UUID;
 
 public class WebcamListener implements PluginMessageListener {
 
     private final String CHANNEL = "webcam:video_frame";
-    private long lastLogTime = 0;
-    private int messageCount = 0;
+    private static final int MAX_PACKET_SIZE = 32000; // 32KB absolute maximum
 
     @Override
     public void onPluginMessageReceived(String channel, Player sender, byte[] message) {
-        if (!channel.equals(CHANNEL)) {
-            WebcamManager.getInstance().getLogger().warning(
-                String.format("Received message on wrong channel: %s (expected: %s)", channel, CHANNEL)
-            );
-            return;
+        if (!channel.equals(CHANNEL)) return;
+
+        // Check packet size before processing
+        if (message.length > MAX_PACKET_SIZE) {
+            return; // Drop oversized packets
         }
 
-        messageCount++;
-        long currentTime = System.currentTimeMillis();
-        
-        // Log only every X seconds to reduce spam (configurable)
-        if (currentTime - lastLogTime > WebcamManager.getInstance().getLogInterval()) {
-            WebcamManager.getInstance().getLogger().info(
-                String.format("Processing webcam messages from %s (received %d messages in last %ds, current size: %d bytes)", 
-                    sender.getName(), messageCount, WebcamManager.getInstance().getLogInterval() / 1000, message.length)
-            );
-            lastLogTime = currentTime;
-            messageCount = 0;
-        }
+        try {
+            MinecraftPacketReader reader = new MinecraftPacketReader(message);
+            
+            int uuidLengthPrefix = reader.readInt();
+            String playerUUID = reader.readString();
+            int width = reader.readInt();
+            int height = reader.readInt();
+            int frameLength = reader.readInt();
+            byte[] frame = reader.readBytes(frameLength);
 
-        try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(message))) {
-            // Read string size with safety check
-            int stringSize = in.readInt();
-            
-            if (stringSize < 0 || stringSize > 1000) {
-                WebcamManager.getInstance().getLogger().warning(
-                    String.format("Invalid string size from %s: %d (message size: %d)", 
-                        sender.getName(), stringSize, message.length)
-                );
+            // Validate frame size
+            if (frameLength > 30000) { // 30KB frame limit
                 return;
             }
-            
-            // Read UUID string
-            byte[] uuidBytes = new byte[stringSize];
-            in.readFully(uuidBytes);
-            String playerUuidString = new String(uuidBytes);
-            
-            // Read dimensions
-            int width = in.readInt();
-            int height = in.readInt();
-            
-            if (width < 0 || height < 0 || width > 10000 || height > 10000) {
-                WebcamManager.getInstance().getLogger().warning(
-                    String.format("Invalid dimensions from %s: %dx%d", sender.getName(), width, height)
-                );
-                return;
-            }
-            
-            // Read frame data
-            int frameLength = in.readInt();
-            
-            if (frameLength < 0 || frameLength > WebcamManager.getInstance().getMaxFrameSize()) {
-                WebcamManager.getInstance().getLogger().warning(
-                    String.format("Invalid frame length from %s: %d (max: %d)", 
-                        sender.getName(), frameLength, WebcamManager.getInstance().getMaxFrameSize())
-                );
-                return;
-            }
-            
-            byte[] frame = new byte[frameLength];
-            in.readFully(frame);
 
-            // Broadcast to nearby players
-            int playersReached = 0;
-            int maxDistance = WebcamManager.getInstance().getMaxDistance();
+            // Create response packet
+            MinecraftPacketWriter writer = new MinecraftPacketWriter();
+            writer.writeInt(uuidLengthPrefix);
+            writer.writeString(playerUUID);
+            writer.writeInt(width);
+            writer.writeInt(height);
+            writer.writeInt(frameLength);
+            writer.writeBytes(frame);
             
+            byte[] responseData = writer.toByteArray();
+
+            // Final size check
+            if (responseData.length > MAX_PACKET_SIZE) {
+                return;
+            }
+
+            // Send to nearby players
             for (Player target : Bukkit.getOnlinePlayers()) {
                 if (target.equals(sender)) continue;
                 if (!target.getWorld().equals(sender.getWorld())) continue;
-                
-                // Check distance (configurable)
-                double distance = target.getLocation().distance(sender.getLocation());
-                if (distance > maxDistance) continue;
+                if (target.getLocation().distance(sender.getLocation()) > 100) continue;
 
-                try {
-                    // Send frame to target player using the same format
-                    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                    DataOutputStream out = new DataOutputStream(byteOut);
-
-                    out.writeInt(playerUuidString.length());
-                    out.writeBytes(playerUuidString);
-                    out.writeInt(width);
-                    out.writeInt(height);
-                    out.writeInt(frame.length);
-                    out.write(frame);
-
-                    target.sendPluginMessage(WebcamManager.getInstance(), CHANNEL, byteOut.toByteArray());
-                    playersReached++;
-                } catch (IOException e) {
-                    WebcamManager.getInstance().getLogger().warning(
-                        String.format("Failed to send webcam data to %s: %s", target.getName(), e.getMessage())
-                    );
-                }
+                target.sendPluginMessage(WebcamManager.getInstance(), CHANNEL, responseData);
             }
 
-        } catch (IOException e) {
-            WebcamManager.getInstance().getLogger().warning(
-                String.format("Failed to parse webcam payload from %s (size: %d): %s", 
-                    sender.getName(), message.length, e.getMessage())
-            );
-            
-            // Print detailed error info only occasionally
-            if (System.currentTimeMillis() % 10000 < 100) {
-                e.printStackTrace();
-            }
         } catch (Exception e) {
-            WebcamManager.getInstance().getLogger().severe(
-                String.format("Unexpected error processing webcam data from %s: %s", 
-                    sender.getName(), e.getMessage())
-            );
-            e.printStackTrace();
+            // Silently ignore malformed packets
         }
     }
 
     public String getChannel() {
         return CHANNEL;
+    }
+
+    // Custom packet reader that matches Minecraft's PacketByteBuf behavior
+    private static class MinecraftPacketReader {
+        private final DataInputStream stream;
+
+        public MinecraftPacketReader(byte[] data) {
+            this.stream = new DataInputStream(new ByteArrayInputStream(data));
+        }
+
+        public int readInt() throws IOException {
+            return stream.readInt();
+        }
+
+        public String readString() throws IOException {
+            int length = readVarInt();
+            if (length > 32767) throw new IOException("String too long");
+            byte[] bytes = new byte[length];
+            stream.readFully(bytes);
+            return new String(bytes, "UTF-8");
+        }
+
+        public byte[] readBytes(int length) throws IOException {
+            byte[] bytes = new byte[length];
+            stream.readFully(bytes);
+            return bytes;
+        }
+
+        private int readVarInt() throws IOException {
+            int value = 0;
+            int position = 0;
+            byte currentByte;
+
+            while (true) {
+                currentByte = stream.readByte();
+                value |= (currentByte & 0x7F) << position;
+
+                if ((currentByte & 0x80) == 0) break;
+
+                position += 7;
+                if (position >= 32) throw new RuntimeException("VarInt too big");
+            }
+
+            return value;
+        }
+    }
+
+    // Custom packet writer that matches Minecraft's PacketByteBuf behavior
+    private static class MinecraftPacketWriter {
+        private final ByteArrayOutputStream byteStream;
+        private final DataOutputStream stream;
+
+        public MinecraftPacketWriter() {
+            this.byteStream = new ByteArrayOutputStream();
+            this.stream = new DataOutputStream(byteStream);
+        }
+
+        public void writeInt(int value) throws IOException {
+            stream.writeInt(value);
+        }
+
+        public void writeString(String value) throws IOException {
+            byte[] bytes = value.getBytes("UTF-8");
+            writeVarInt(bytes.length);
+            stream.write(bytes);
+        }
+
+        public void writeBytes(byte[] bytes) throws IOException {
+            stream.write(bytes);
+        }
+
+        public byte[] toByteArray() {
+            return byteStream.toByteArray();
+        }
+
+        private void writeVarInt(int value) throws IOException {
+            while (true) {
+                if ((value & 0xFFFFFF80) == 0) {
+                    stream.writeByte(value);
+                    return;
+                }
+
+                stream.writeByte(value & 0x7F | 0x80);
+                value >>>= 7;
+            }
+        }
     }
 }

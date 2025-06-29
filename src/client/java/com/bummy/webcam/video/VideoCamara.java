@@ -69,26 +69,80 @@ public class VideoCamara {
 
     public static void get(PlayerVideo playerVideo) throws IOException {
         BufferedImage image = webcam.getImage();
-        // Update the player video with the native resolution
-        playerVideo.width = image.getWidth();
-        playerVideo.height = image.getHeight();
+        
+        // Aggressive compression to stay within packet limits
+        BufferedImage compressedImage = aggressiveCompress(image);
+        
+        // Update the player video with the compressed image dimensions
+        playerVideo.width = compressedImage.getWidth();
+        playerVideo.height = compressedImage.getHeight();
 
-        // Compress image using JPEG
+        // Final JPEG compression with very low quality
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
         ImageWriter writer = writers.next();
         JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
         jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
-        jpegParams.setCompressionQuality(1);
+        jpegParams.setCompressionQuality(0.3f); // Improved quality from 0.1f to 0.3f
         writer.setOutput(ios);
-        IIOImage outputImage = new IIOImage(image, null, null);
+        IIOImage outputImage = new IIOImage(compressedImage, null, null);
 
         writer.write(null, outputImage, jpegParams);
         writer.dispose();
         ios.close();
-        // Save compressed image to object
-        playerVideo.setFrame(baos.toByteArray());
+        
+        byte[] frameData = baos.toByteArray();
+        
+        // Final size check - if still too large, compress more
+        if (frameData.length > 28000) { // Increased limit from 25KB to 28KB
+            frameData = emergencyCompress(compressedImage);
+        }
+        
+        playerVideo.setFrame(frameData);
+    }
+
+    private static BufferedImage aggressiveCompress(BufferedImage original) {
+        int originalWidth = original.getWidth();
+        int originalHeight = original.getHeight();
+        
+        // Increase resolution slightly for better quality
+        int targetWidth = Math.min(originalWidth, 240);  // Increased from 160
+        int targetHeight = Math.min(originalHeight, 180); // Increased from 120
+        
+        // Maintain aspect ratio
+        double ratio = Math.min((double) targetWidth / originalWidth, (double) targetHeight / originalHeight);
+        targetWidth = (int) (originalWidth * ratio);
+        targetHeight = (int) (originalHeight * ratio);
+        
+        // Ensure minimum size
+        if (targetWidth < 48) targetWidth = 48;   // Increased from 32
+        if (targetHeight < 48) targetHeight = 48; // Increased from 32
+        
+        return resize(original, targetWidth, targetHeight);
+    }
+
+    private static byte[] emergencyCompress(BufferedImage image) throws IOException {
+        // Emergency compression with moderate quality reduction
+        BufferedImage emergencyImage = resize(image, 
+            Math.max(32, (int)(image.getWidth() * 0.75)), 
+            Math.max(32, (int)(image.getHeight() * 0.75)));
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
+        ImageWriter writer = writers.next();
+        JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+        jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
+        jpegParams.setCompressionQuality(0.15f); // Improved emergency quality from 0.05f to 0.15f
+        writer.setOutput(ios);
+        IIOImage outputImage = new IIOImage(emergencyImage, null, null);
+
+        writer.write(null, outputImage, jpegParams);
+        writer.dispose();
+        ios.close();
+        
+        return baos.toByteArray();
     }
 
     public static BufferedImage resize(BufferedImage original, int width, int height) {
