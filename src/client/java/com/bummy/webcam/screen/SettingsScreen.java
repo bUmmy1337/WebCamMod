@@ -85,8 +85,13 @@ public class SettingsScreen extends Screen {
         listWidget.onSelected((String name) -> {
             try {
                 VideoCamara.setWebcamByName(name);
+                WebcamMod.LOGGER.info("Successfully selected webcam: {}", name);
             } catch (WebcamException exception) {
-                System.out.println(exception.getMessage());
+                WebcamMod.LOGGER.error("Failed to select webcam: {}", name, exception);
+                // Show error message to user
+                if (client != null && client.player != null) {
+                    client.player.sendMessage(Text.translatable("gui.webcam.settings.webcam_error", name, exception.getMessage()), false);
+                }
             }
             return null;
         });
@@ -221,71 +226,7 @@ public class SettingsScreen extends Screen {
             y += spacing;
         }
 
-        // Zoom and Stretch controls
-        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.translatable("gui.webcam.settings.zoom", String.format("%.2f", config.getZoom())),
-            (config.getZoom() - 0.1f) / 4.9f) {
-            @Override
-            protected void updateMessage() {
-                float value = (float) (this.value * 4.9f + 0.1f);
-                this.setMessage(Text.translatable("gui.webcam.settings.zoom", String.format("%.2f", value)));
-            }
-            @Override
-            protected void applyValue() {
-                float value = (float) (this.value * 4.9f + 0.1f);
-                config.setZoom(value);
-            }
-        });
-        y += spacing;
-
-        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.translatable("gui.webcam.settings.stretch", String.format("%.2f", config.getStretch())),
-            (config.getStretch() - 0.1f) / 4.9f) {
-            @Override
-            protected void updateMessage() {
-                float value = (float) (this.value * 4.9f + 0.1f);
-                this.setMessage(Text.translatable("gui.webcam.settings.stretch", String.format("%.2f", value)));
-            }
-            @Override
-            protected void applyValue() {
-                float value = (float) (this.value * 4.9f + 0.1f);
-                config.setStretch(value);
-            }
-        });
-        y += spacing;
-
-        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.translatable("gui.webcam.settings.pan_x", String.format("%.2f", config.getPanX())),
-            (config.getPanX() + 0.5f)) {
-            @Override
-            protected void updateMessage() {
-                float value = (float) (this.value - 0.5f);
-                this.setMessage(Text.translatable("gui.webcam.settings.pan_x", String.format("%.2f", value)));
-            }
-            @Override
-            protected void applyValue() {
-                float value = (float) (this.value - 0.5f);
-                config.setPanX(value);
-            }
-        });
-        y += spacing;
-
-        addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
-            Text.translatable("gui.webcam.settings.pan_y", String.format("%.2f", config.getPanY())),
-            (config.getPanY() + 0.5f)) {
-            @Override
-            protected void updateMessage() {
-                float value = (float) (this.value - 0.5f);
-                this.setMessage(Text.translatable("gui.webcam.settings.pan_y", String.format("%.2f", value)));
-            }
-            @Override
-            protected void applyValue() {
-                float value = (float) (this.value - 0.5f);
-                config.setPanY(value);
-            }
-        });
-        y += spacing;
-
+        
         // Reset button
         addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.settings.reset_to_defaults"), button -> {
             config.offsetX = 0.0f;
@@ -295,10 +236,6 @@ public class SettingsScreen extends Screen {
             config.circular = true;
             config.circleSegments = 32;
             config.opacity = 1.0f;
-            config.zoom = 1.0f;
-            config.stretch = 1.0f;
-            config.panX = 0.0f;
-            config.panY = 0.0f;
             config.rotateWithPlayer = true;
             config.save();
             // Reinitialize the screen to update all controls
