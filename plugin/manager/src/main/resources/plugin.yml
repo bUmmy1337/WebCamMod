@@ -1,0 +1,22 @@
+name: WebcamManager
+version: '${version}'
+main: com.bummy.webcam.WebcamManager
+api-version: '1.21'
+description: Server-side plugin for Webcam Mod
+author: bUmmy1337
+website: https://modrinth.com/plugin/webcam
+
+commands:
+  webcam:
+    description: WebcamManager administration commands
+    usage: /<command> [status|reload|debug]
+    permission: webcam.admin
+    permission-message: You don't have permission to use this command.
+
+permissions:
+  webcam.admin:
+    description: Allows access to WebcamManager admin commands
+    default: op
+  webcam.use:
+    description: Allows using webcam features
+    default: true
