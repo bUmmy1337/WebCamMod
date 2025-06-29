@@ -10,7 +10,7 @@ import net.minecraft.util.Formatting;
 public class WelcomeScreen extends Screen {
     
     public WelcomeScreen() {
-        super(Text.literal("Webcam Mod - Добро пожаловать!"));
+        super(Text.translatable("gui.webcam.welcome.title"));
     }
     
     @Override
@@ -19,7 +19,7 @@ public class WelcomeScreen extends Screen {
         
         // Кнопка "Настроить мод"
         this.addDrawableChild(ButtonWidget.builder(
-            Text.literal("Настроить мод"),
+            Text.translatable("gui.webcam.welcome.configure"),
             button -> {
                 WebcamConfig.getInstance().setFirstRun(false);
                 this.client.setScreen(new SettingsScreen());
@@ -28,7 +28,7 @@ public class WelcomeScreen extends Screen {
         
         // Кнопка "Пропустить"
         this.addDrawableChild(ButtonWidget.builder(
-            Text.literal("Пропустить"),
+            Text.translatable("gui.webcam.welcome.skip"),
             button -> {
                 WebcamConfig.getInstance().setFirstRun(false);
                 this.close();
@@ -43,30 +43,30 @@ public class WelcomeScreen extends Screen {
         // Заголовок
         context.drawCenteredTextWithShadow(
             this.textRenderer,
-            Text.literal("Добро пожаловать в Webcam Bubbles!").formatted(Formatting.GOLD, Formatting.BOLD),
+            Text.translatable("gui.webcam.welcome.header").formatted(Formatting.GOLD, Formatting.BOLD),
             this.width / 2,
             this.height / 2 - 60,
             0xFFFFFF
         );
         
         // Описание
-        String[] lines = {
-            "Этот мод позволяет отображать веб-камеру над головой игрока.",
-            "",
-            "Для корректной работы мода рекомендуется настроить:",
-            "• Позицию и размер веб-камеры",
-            "• Режим отображения (голограмма или следование за игроком)",
-            "• Прозрачность и другие параметры",
-            "",
-            "Вы можете настроить мод сейчас или сделать это позже",
-            "через команду /webcam-settings или горячую клавишу."
+        String[] lineKeys = {
+            "gui.webcam.welcome.description.line1",
+            "gui.webcam.welcome.description.line2",
+            "gui.webcam.welcome.description.line3",
+            "gui.webcam.welcome.description.line4",
+            "gui.webcam.welcome.description.line5",
+            "gui.webcam.welcome.description.line6",
+            "gui.webcam.welcome.description.line7",
+            "gui.webcam.welcome.description.line8",
+            "gui.webcam.welcome.description.line9"
         };
         
         int startY = this.height / 2 - 30;
-        for (int i = 0; i < lines.length; i++) {
+        for (int i = 0; i < lineKeys.length; i++) {
             context.drawCenteredTextWithShadow(
                 this.textRenderer,
-                Text.literal(lines[i]),
+                Text.translatable(lineKeys[i]),
                 this.width / 2,
                 startY + i * 10,
                 0xCCCCCC
