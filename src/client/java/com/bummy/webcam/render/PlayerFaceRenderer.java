@@ -18,6 +18,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 import static org.lwjgl.opengl.GL33.*;
 
@@ -59,6 +60,16 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
 
         // Position above the head instead of in front of face
         matrices.translate(config.getOffsetX(), config.getOffsetY(), config.getOffsetZ());
+
+        if (config.shouldRotateWithPlayer()) {
+            // Traditional mode - webcam follows player's head rotation
+            // No additional rotation needed, webcam will rotate with player model
+        } else {
+            // Hologram mode - webcam always faces the camera/viewer
+            Quaternionf cameraRotation = new Quaternionf(MinecraftClient.getInstance().gameRenderer.getCamera().getRotation());
+            matrices.multiply(cameraRotation.conjugate());
+        }
+
         matrices.scale(config.getScale(), config.getScale(), 1f);
 
         MatrixStack.Entry entry = matrices.peek();

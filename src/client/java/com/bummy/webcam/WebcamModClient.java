@@ -3,6 +3,8 @@ package com.bummy.webcam;
 import com.bummy.webcam.render.PlayerFaceRenderer;
 
 import com.bummy.webcam.screen.SettingsScreen;
+import com.bummy.webcam.screen.WelcomeScreen;
+import com.bummy.webcam.config.WebcamConfig;
 import com.bummy.webcam.video.VideoManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -44,6 +46,11 @@ public class WebcamModClient implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			VideoManager.startCameraLoop();
+			
+			// Show welcome screen for first-time users
+			if (WebcamConfig.getInstance().isFirstRun()) {
+				client.send(() -> client.setScreen(new WelcomeScreen()));
+			}
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register(((handler, client) -> {

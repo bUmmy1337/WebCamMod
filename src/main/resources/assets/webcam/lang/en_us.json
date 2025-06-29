@@ -1,10 +1,9 @@
 {
-  "name": "WebCam Bubbles",
-  "description": "Adds webcam bubbles to minecraft",
   "gui.webcam.settings.title": "Webcam Settings",
   "gui.webcam.settings.opening_webcam": "Opening webcam...",
   "gui.webcam.settings.webcam_configuration": "Webcam Configuration",
   "gui.webcam.settings.close": "Close",
+  "gui.webcam.settings.select_webcam": "Select Webcam",
   "gui.webcam.settings.x_offset": "X Offset: %s",
   "gui.webcam.settings.y_offset": "Y Offset: %s",
   "gui.webcam.settings.z_offset": "Z Offset: %s",
@@ -19,13 +18,7 @@
   "gui.webcam.settings.pan_y": "Pan Y: %s",
   "gui.webcam.settings.reset_to_defaults": "Reset to Defaults",
   "gui.webcam.settings.preview_settings": "Preview Settings",
-  "gui.webcam.settings.select_webcam": "Select Webcam",
-  "gui.webcam.preview_settings.title": "Preview Settings",
-  "gui.webcam.preview_settings.x_position": "X Position: %s",
-  "gui.webcam.preview_settings.y_position": "Y Position: %s",
-  "gui.webcam.preview_settings.size": "Size: %s",
-  "gui.webcam.preview_settings.enabled": "Enabled: %s",
-  "gui.webcam.preview_settings.back": "Back",
+  "gui.webcam.settings.rotate_with_player": "Rotate with player",
   "category.webcam.main": "Webcam",
   "key.webcam.settings": "Open Webcam Settings"
 }

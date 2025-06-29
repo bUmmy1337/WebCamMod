@@ -35,6 +35,11 @@ public class WebcamConfig {
     public float panX = 0.0f;
     public float panY = 0.0f;
 
+    public boolean rotateWithPlayer = true;
+    
+    // First run flag
+    public boolean isFirstRun = true;
+
     public static WebcamConfig getInstance() {
         if (instance == null) {
             instance = load();
@@ -102,4 +107,10 @@ public class WebcamConfig {
 
     public float getPanY() { return panY; }
     public void setPanY(float panY) { this.panY = panY; save(); }
+
+    public boolean shouldRotateWithPlayer() { return rotateWithPlayer; }
+    public void setRotateWithPlayer(boolean rotate) { this.rotateWithPlayer = rotate; save(); }
+    
+    public boolean isFirstRun() { return isFirstRun; }
+    public void setFirstRun(boolean firstRun) { this.isFirstRun = firstRun; save(); }
 }

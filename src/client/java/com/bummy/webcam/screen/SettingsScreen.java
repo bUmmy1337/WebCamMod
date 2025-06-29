@@ -194,6 +194,14 @@ public class SettingsScreen extends Screen {
         }).dimensions(rightPanelX, y, controlWidth, 20).build());
         y += spacing;
 
+        // Rotate with player toggle button
+        Text rotateText = Text.translatable("gui.webcam.settings.rotate_with_player").append(config.shouldRotateWithPlayer() ? ": On" : ": Off");
+        addDrawableChild(ButtonWidget.builder(rotateText, button -> {
+            config.setRotateWithPlayer(!config.shouldRotateWithPlayer());
+            button.setMessage(Text.translatable("gui.webcam.settings.rotate_with_player").append(config.shouldRotateWithPlayer() ? ": On" : ": Off"));
+        }).dimensions(rightPanelX, y, controlWidth, 20).build());
+        y += spacing;
+
         // Circle segments control (only visible when circular)
         if (config.isCircular()) {
             addDrawableChild(new SliderWidget(rightPanelX, y, controlWidth, 20, 
@@ -291,6 +299,7 @@ public class SettingsScreen extends Screen {
             config.stretch = 1.0f;
             config.panX = 0.0f;
             config.panY = 0.0f;
+            config.rotateWithPlayer = true;
             config.save();
             // Reinitialize the screen to update all controls
             this.init();
@@ -298,9 +307,11 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         // Preview settings button
-        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.settings.preview_settings"), button -> {
+        ButtonWidget previewButton = ButtonWidget.builder(Text.translatable("gui.webcam.settings.preview_settings"), button -> {
             client.setScreen(new PreviewSettingsScreen(this));
-        }).dimensions(rightPanelX, y, controlWidth, 20).build());
+        }).dimensions(rightPanelX, y, controlWidth, 20).build();
+        previewButton.active = false;
+        addDrawableChild(previewButton);
     }
 
     public static void drawEntity(DrawContext context, int x1, int y1, int x2, int y2, float size, float f, float mouseX, float mouseY, LivingEntity entity) {
