@@ -1,0 +1,7 @@
+name: WebcamManager
+version: '${version}'
+main: com.bummy.webcam.WebcamManager
+api-version: '1.21'
+description: Server-side plugin for Webcam Mod
+author: bUmmy1337
+website: https://modrinth.com/mod/webcam
