@@ -15,6 +15,8 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL33.*;
@@ -34,6 +36,13 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
         PlayerListEntry playerListEntry = clientPlayNetworkHandler.getPlayerListEntry(state.name);
         if (playerListEntry == null) {
             return;
+        }
+
+        if (MinecraftClient.getInstance().world != null) {
+            PlayerEntity player = MinecraftClient.getInstance().world.getPlayerByUuid(playerListEntry.getProfile().getId());
+            if (player != null && player.hasStatusEffect(StatusEffects.INVISIBILITY)) {
+                return;
+            }
         }
 
         String playerUUID = playerListEntry.getProfile().getId().toString();
