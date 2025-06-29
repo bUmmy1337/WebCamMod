@@ -119,12 +119,7 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
     }
 
     private void renderCircularWebcam(BufferBuilder buffer, Matrix4f position, int segments) {
-        WebcamConfig config = WebcamConfig.getInstance();
         float radius = 1.0f;
-        float zoom = config.getZoom();
-        float stretch = config.getStretch();
-        float panX = config.getPanX();
-        float panY = config.getPanY();
 
         for (int i = 0; i < segments; i++) {
             float angle1 = (float) (2 * Math.PI * i / segments);
@@ -135,12 +130,14 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
             float x2 = (float) Math.cos(angle2) * radius;
             float y2 = (float) Math.sin(angle2) * radius;
 
-            float u1 = (x1 * stretch / zoom + 1) / 2 + panX;
-            float v1 = (y1 / zoom + 1) / 2 + panY;
-            float u2 = (x2 * stretch / zoom + 1) / 2 + panX;
-            float v2 = (y2 / zoom + 1) / 2 + panY;
-            float uc = 0.5f + panX;
-            float vc = 0.5f + panY;
+            // Map circle coordinates to texture coordinates (0-1 range)
+            // Since image is now forced to be square, we can use simple mapping
+            float u1 = (x1 + 1) / 2;
+            float v1 = (y1 + 1) / 2;
+            float u2 = (x2 + 1) / 2;
+            float v2 = (y2 + 1) / 2;
+            float uc = 0.5f; // Center of texture
+            float vc = 0.5f; // Center of texture
 
             buffer.vertex(position, 0, 0, 0).texture(uc, vc);
             buffer.vertex(position, x1, y1, 0).texture(u1, v1);
@@ -149,23 +146,19 @@ public class PlayerFaceRenderer extends FeatureRenderer<PlayerEntityRenderState,
     }
 
     private void renderRectangularWebcam(BufferBuilder buffer, Matrix4f position) {
-        WebcamConfig config = WebcamConfig.getInstance();
-        float zoom = config.getZoom();
-        float stretch = config.getStretch();
-        float panX = config.getPanX();
-        float panY = config.getPanY();
+        // Simple texture mapping for rectangular webcam
+        // Since image is now forced to be square, we use full texture coordinates
+        float u1 = 0.0f;
+        float v1 = 0.0f;
+        float u2 = 1.0f;
+        float v2 = 1.0f;
 
-        float u1 = (0.5f - 0.5f / zoom) * stretch + panX;
-        float v1 = (0.5f - 0.5f / zoom) + panY;
-        float u2 = (0.5f + 0.5f / zoom) * stretch + panX;
-        float v2 = (0.5f + 0.5f / zoom) + panY;
+        buffer.vertex(position, 1, -1, 0).texture(u2, v1);
+        buffer.vertex(position, 1, 1, 0).texture(u2, v2);
+        buffer.vertex(position, -1, 1, 0).texture(u1, v2);
 
-        buffer.vertex(position, 1, -1, 0).texture(u1, v1);
-        buffer.vertex(position, 1, 1, 0).texture(u1, v2);
-        buffer.vertex(position, -1, 1, 0).texture(u2, v2);
-
-        buffer.vertex(position, -1, 1, 0).texture(u2, v2);
-        buffer.vertex(position, 1, -1, 0).texture(u1, v1);
-        buffer.vertex(position, -1, -1, 0).texture(u2, v1);
+        buffer.vertex(position, -1, 1, 0).texture(u1, v2);
+        buffer.vertex(position, 1, -1, 0).texture(u2, v1);
+        buffer.vertex(position, -1, -1, 0).texture(u1, v1);
     }
 }
