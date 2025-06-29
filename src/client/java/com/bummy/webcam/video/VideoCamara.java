@@ -84,7 +84,7 @@ public class VideoCamara {
         ImageWriter writer = writers.next();
         JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
         jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
-        jpegParams.setCompressionQuality(0.1f); // Very low quality for maximum compression
+        jpegParams.setCompressionQuality(0.3f); // Improved quality from 0.1f to 0.3f
         writer.setOutput(ios);
         IIOImage outputImage = new IIOImage(compressedImage, null, null);
 
@@ -95,7 +95,7 @@ public class VideoCamara {
         byte[] frameData = baos.toByteArray();
         
         // Final size check - if still too large, compress more
-        if (frameData.length > 25000) { // 25KB limit
+        if (frameData.length > 28000) { // Increased limit from 25KB to 28KB
             frameData = emergencyCompress(compressedImage);
         }
         
@@ -123,10 +123,10 @@ public class VideoCamara {
     }
 
     private static byte[] emergencyCompress(BufferedImage image) throws IOException {
-        // Emergency compression with extremely low quality and smaller size
+        // Emergency compression with moderate quality reduction
         BufferedImage emergencyImage = resize(image, 
-            Math.max(16, image.getWidth() / 2), 
-            Math.max(16, image.getHeight() / 2));
+            Math.max(32, (int)(image.getWidth() * 0.75)), 
+            Math.max(32, (int)(image.getHeight() * 0.75)));
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
@@ -134,7 +134,7 @@ public class VideoCamara {
         ImageWriter writer = writers.next();
         JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
         jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
-        jpegParams.setCompressionQuality(0.05f); // Extremely low quality
+        jpegParams.setCompressionQuality(0.15f); // Improved emergency quality from 0.05f to 0.15f
         writer.setOutput(ios);
         IIOImage outputImage = new IIOImage(emergencyImage, null, null);
 
