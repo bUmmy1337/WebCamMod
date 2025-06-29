@@ -5,9 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.*;
-import java.util.UUID;
 
-public class WebcamListener implements PluginMessageListener {
+public class FixedWebcamListener implements PluginMessageListener {
 
     private final String CHANNEL = "webcam:video_frame";
     private long lastLogTime = 0;
@@ -36,25 +35,33 @@ public class WebcamListener implements PluginMessageListener {
         }
 
         try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(message))) {
-            // Read string size with safety check
-            int stringSize = in.readInt();
+            // Based on debug output, the format is:
+            // 1. int stringLength (36)
+            // 2. String UUID (but with writeString format)
+            // 3. int width
+            // 4. int height  
+            // 5. int frameLength
+            // 6. byte[] frame
             
-            if (stringSize < 0 || stringSize > 1000) {
+            // Read string length
+            int stringLength = in.readInt();
+            WebcamManager.getInstance().getLogger().info("String length: " + stringLength);
+            
+            if (stringLength < 0 || stringLength > 1000) {
                 WebcamManager.getInstance().getLogger().warning(
-                    String.format("Invalid string size from %s: %d (message size: %d)", 
-                        sender.getName(), stringSize, message.length)
+                    String.format("Invalid string length from %s: %d", sender.getName(), stringLength)
                 );
                 return;
             }
             
-            // Read UUID string
-            byte[] uuidBytes = new byte[stringSize];
-            in.readFully(uuidBytes);
-            String playerUuidString = new String(uuidBytes);
+            // Read UUID string using readUTF() format
+            String playerUuidString = in.readUTF();
+            WebcamManager.getInstance().getLogger().info("UUID: " + playerUuidString);
             
             // Read dimensions
             int width = in.readInt();
             int height = in.readInt();
+            WebcamManager.getInstance().getLogger().info("Dimensions: " + width + "x" + height);
             
             if (width < 0 || height < 0 || width > 10000 || height > 10000) {
                 WebcamManager.getInstance().getLogger().warning(
@@ -65,6 +72,7 @@ public class WebcamListener implements PluginMessageListener {
             
             // Read frame data
             int frameLength = in.readInt();
+            WebcamManager.getInstance().getLogger().info("Frame length: " + frameLength);
             
             if (frameLength < 0 || frameLength > WebcamManager.getInstance().getMaxFrameSize()) {
                 WebcamManager.getInstance().getLogger().warning(
@@ -76,6 +84,11 @@ public class WebcamListener implements PluginMessageListener {
             
             byte[] frame = new byte[frameLength];
             in.readFully(frame);
+            
+            WebcamManager.getInstance().getLogger().info(
+                String.format("Successfully parsed frame from %s: %dx%d, %d bytes", 
+                    sender.getName(), width, height, frameLength)
+            );
 
             // Broadcast to nearby players
             int playersReached = 0;
@@ -95,7 +108,7 @@ public class WebcamListener implements PluginMessageListener {
                     DataOutputStream out = new DataOutputStream(byteOut);
 
                     out.writeInt(playerUuidString.length());
-                    out.writeBytes(playerUuidString);
+                    out.writeUTF(playerUuidString);
                     out.writeInt(width);
                     out.writeInt(height);
                     out.writeInt(frame.length);
@@ -109,17 +122,19 @@ public class WebcamListener implements PluginMessageListener {
                     );
                 }
             }
+            
+            if (playersReached > 0) {
+                WebcamManager.getInstance().getLogger().info(
+                    String.format("Broadcasted frame to %d players", playersReached)
+                );
+            }
 
         } catch (IOException e) {
             WebcamManager.getInstance().getLogger().warning(
                 String.format("Failed to parse webcam payload from %s (size: %d): %s", 
                     sender.getName(), message.length, e.getMessage())
             );
-            
-            // Print detailed error info only occasionally
-            if (System.currentTimeMillis() % 10000 < 100) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         } catch (Exception e) {
             WebcamManager.getInstance().getLogger().severe(
                 String.format("Unexpected error processing webcam data from %s: %s", 

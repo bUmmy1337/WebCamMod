@@ -1,0 +1,39 @@
+# ========================================
+# WebcamManager Plugin Configuration
+# ========================================
+
+# Debug mode - shows detailed packet analysis
+# WARNING: Generates lots of log output! Only enable for troubleshooting.
+# Set to true to see:
+# - Raw packet data in hex format
+# - Packet structure analysis
+# - Data parsing attempts
+debug: false
+
+# Maximum distance for webcam broadcasting (in blocks)
+# Players further than this distance won't see each other's webcams
+max-distance: 100
+
+# Maximum frame size (in bytes) - prevents memory issues
+# Frames larger than this will be rejected
+# Default: 10MB (10,000,000 bytes)
+max-frame-size: 10000000
+
+# Log interval (in milliseconds) - how often to log statistics
+# Reduces spam by only logging every X milliseconds
+# Default: 5 seconds (5000 ms)
+log-interval: 5000
+
+# ========================================
+# Advanced Settings
+# ========================================
+
+# Enable performance monitoring
+performance-monitoring: false
+
+# Maximum players that can broadcast simultaneously
+max-broadcasters: 10
+
+# Compression settings (future feature)
+enable-compression: false
+compression-level: 6
