@@ -29,6 +29,12 @@
   "gui.webcam.welcome.description.line9": "через команду /webcam-settings или горячую клавишу.",
   "gui.webcam.welcome.configure": "Настроить мод",
   "gui.webcam.welcome.skip": "Пропустить",
+  "gui.webcam.preview_settings.title": "Настройки предпросмотра",
+  "gui.webcam.preview_settings.x_position": "Позиция по X: %s",
+  "gui.webcam.preview_settings.y_position": "Позиция по Y: %s",
+  "gui.webcam.preview_settings.size": "Размер: %s",
+  "gui.webcam.preview_settings.enabled": "Предпросмотр включен: %s",
+  "gui.webcam.preview_settings.back": "Назад",
   "category.webcam.main": "Вебкамера",
   "key.webcam.settings": "Открыть настройки вебкамеры"
 }

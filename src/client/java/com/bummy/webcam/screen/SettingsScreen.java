@@ -244,11 +244,9 @@ public class SettingsScreen extends Screen {
         y += spacing;
 
         // Preview settings button
-        ButtonWidget previewButton = ButtonWidget.builder(Text.translatable("gui.webcam.settings.preview_settings"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.webcam.settings.preview_settings"), button -> {
             client.setScreen(new PreviewSettingsScreen(this));
-        }).dimensions(rightPanelX, y, controlWidth, 20).build();
-        previewButton.active = false;
-        addDrawableChild(previewButton);
+        }).dimensions(rightPanelX, y, controlWidth, 20).build());
     }
 
     public static void drawEntity(DrawContext context, int x1, int y1, int x2, int y2, float size, float f, float mouseX, float mouseY, LivingEntity entity) {

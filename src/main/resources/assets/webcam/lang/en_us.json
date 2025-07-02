@@ -29,6 +29,12 @@
   "gui.webcam.welcome.description.line9": "via /webcam-settings command or hotkey.",
   "gui.webcam.welcome.configure": "Configure Mod",
   "gui.webcam.welcome.skip": "Skip",
+  "gui.webcam.preview_settings.title": "Preview Settings",
+  "gui.webcam.preview_settings.x_position": "X Position: %s",
+  "gui.webcam.preview_settings.y_position": "Y Position: %s",
+  "gui.webcam.preview_settings.size": "Size: %s",
+  "gui.webcam.preview_settings.enabled": "Preview Enabled: %s",
+  "gui.webcam.preview_settings.back": "Back",
   "category.webcam.main": "Webcam",
   "key.webcam.settings": "Open Webcam Settings"
 }
